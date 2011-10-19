@@ -189,10 +189,6 @@ draw = function()
 
   ctx.clearRect( 0, 0, f_W, f_H );
 
-  // draw the field
-  ctx.strokeStyle = "rgb( 115, 115, 115 )"
-  ctx.strokeRect( 0, 0, f_W, f_H )
-
   // draw the ball
   ctx.strokeStyle = "#000";
   ctx.lineWidth   = 2;
