@@ -42,6 +42,13 @@ init = function()
   g_dtDraw   = 33; // in ms
   g_dtUpdate = 33;
 
+  /* Animations timing, in seconds */
+  a_HOVER = 0.15; // time for the animation to complete (constant)
+  a_CLICK = 0.15;
+
+  a_hoverCur = 0; // current time of a running animation
+  a_clickCur = 0;
+
   /* Field */
   f_W = h_canvas.width
   f_H = h_canvas.height
@@ -51,8 +58,8 @@ init = function()
 
   /* Balls of steel */
   b_C_FR  = "rgb( 255, 94, 94 )";   // ball's color if not clicked
-  b_C_CLK = "rgb( 121, 125, 242 )"; // ball's color if clicked
-  b_C_HVR = "rgb( 150, 255, 150 )"; // ball's hover zone color
+  b_C_CLK = function( alpha ){ return "rgba( 121, 125, 242, " + alpha + " )"; } // ball's color if clicked
+  b_C_HVR = function( alpha ){ return "rgba( 150, 255, 150, " + alpha + " )"; } // ball's hover zone color
   b_R     = 10;      // ball's radius
   b_R_SP  = 40;      // radius for the "spin zone"
   b_WGT   = 0.21;    // ball's weight (in kg)
@@ -76,6 +83,31 @@ init = function()
 }
 
 
+/* set the hovering property of the ball */
+setHover = function( hover )
+{
+  // do that only if there is an actual change
+  if( b_hover != hover )
+  {
+    b_hover = hover;
+
+    a_hoverCur = 0;
+  }
+}
+
+/* set the hovering property of the ball */
+setClick = function( click )
+{
+  // do that only if there is an actual change
+  if( b_click != click )
+  {
+    b_click = click;
+
+    a_clickCur = 0;
+  }
+}
+
+
 /* mouse events handlers */
 onMouseDown = function( evt )
 {
@@ -84,14 +116,14 @@ onMouseDown = function( evt )
   // check if we are in the clickable zone
   if( b_hover )
   {
-    b_click = true;
+    setClick( true );
 
     // if we are somewhere in the ball we stick the start point to the
     // middle of the ball
     if( Math.sqrt( Math.pow( b_x - cursorPostion.X, 2 ) +
                    Math.pow( b_y - cursorPostion.Y, 2 )   ) <= b_R )
     {
-      b_hover = false;
+      setHover( false );
 
       b_pClic.X = b_x;
       b_pClic.Y = b_y;
@@ -115,8 +147,10 @@ onMouseUp = function( evt )
   // move by waiting for g_M_T_OUT to expire.
   if( b_click )
   {
-    b_click = false;
-    b_hover = false;
+    setClick( false );
+    setHover( false );
+
+    a_clickCur = 0;
 
     var force = { X : b_force.X * g_F_SCALE, Y : b_force.Y * g_F_SCALE };
 
@@ -148,14 +182,14 @@ onMouseMove = function( evt )
   }
   else
   {
-    b_hover = ( Math.sqrt( Math.pow( b_x - cursorPostion.X, 2 ) +
-                           Math.pow( b_y - cursorPostion.Y, 2 )   ) <= b_R_SP );
+    setHover( Math.sqrt( Math.pow( b_x - cursorPostion.X, 2 ) +
+                         Math.pow( b_y - cursorPostion.Y, 2 )   ) <= b_R_SP );
   }
 }
 
 mouseMoveTimeout = function()
 {
-  b_click = false;
+  setClick( false );
 }
 
 /* Compute cursor postion from a mouse event */
@@ -202,7 +236,7 @@ draw = function()
 
   if( b_hover )
   {
-    ctx.fillStyle = b_C_HVR;
+    ctx.fillStyle = b_C_HVR( a_hoverCur / a_HOVER );
 
     ctx.beginPath();
 
@@ -250,15 +284,6 @@ draw = function()
     }
   }
 
-  if( b_click )
-  {
-    ctx.fillStyle = b_C_CLK;
-  }
-  else
-  {
-    ctx.fillStyle = b_C_FR;
-  }
-
   ctx.beginPath();
   ctx.arc( b_x, b_y, b_R, 0, Math.PI*2 );
 
@@ -270,7 +295,15 @@ draw = function()
 
   ctx.closePath();
 
+  ctx.fillStyle = b_C_FR;
   ctx.fill();
+
+  if( b_click )
+  {
+    ctx.fillStyle = b_C_CLK( a_clickCur / a_CLICK );
+    ctx.fill();
+  }
+
   ctx.stroke();
 
   ctx.restore();
@@ -290,6 +323,18 @@ update = function( dt )
 
   b_x = b_x + ( b_sx * dt );
   b_y = b_y + ( b_sy * dt );
+
+  // if we are hovering and the animation is still running
+  if( b_hover && a_hoverCur < a_HOVER )
+  {
+    a_hoverCur = a_hoverCur + dt;
+  }
+
+  // same for the click
+  if( b_click && a_clickCur < a_CLICK )
+  {
+    a_clickCur = a_clickCur + dt;
+  }
 
   // if ball stopped then the user can click again.
   if( Math.abs( b_sx ) < g_EPS && Math.abs( b_sy ) < g_EPS &&
