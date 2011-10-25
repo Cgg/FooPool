@@ -1,3 +1,38 @@
+.wrapper
+{
+  display : table;
+}
+
+.row
+{
+  display : table-row;
+}
+
+.cell
+{
+  display : table-cell;
+  border  : 1px solid gray;
+  padding : 0.2em;
+  /* add stuff to specify margin, border, etc. */
+}
+
+.row:first-child
+{
+  font-weight : bold;
+  text-align  : center;
+}
+
+.cell:first-child
+{
+  font-weight : bold;
+  text-align  : center;
+}
+
+.caption
+{
+  width : 25%;
+}
+
 canvas
 {
   border : 1px solid gray;

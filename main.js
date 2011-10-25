@@ -1,5 +1,3 @@
-// TODO deactivate mouse interactions when the ball is moving
-
 /* FooPool
  *
  * A kind of pool simulation in JavaScript. Quite basic for now:
@@ -23,7 +21,14 @@
 init = function()
 {
   /* Wonderful html world */
-  h_canvas = document.getElementById( "mainCanvas" )
+  h_canvas = document.getElementById( "mainCanvas" );
+  h_stats  = document.getElementById( "statistic" );
+  h_x      = document.getElementById( "x" );
+  h_y      = document.getElementById( "y" );
+  h_sx      = document.getElementById( "sx" );
+  h_sy      = document.getElementById( "sy" );
+  h_ax      = document.getElementById( "ax" );
+  h_ay      = document.getElementById( "ay" );
 
   /* game variables */
   g_F_SCALE  = 8;    // scaling factor applied to the graphic vector to get
@@ -41,6 +46,8 @@ init = function()
   f_W = h_canvas.width
   f_H = h_canvas.height
   f_F = 0.2;             // friction factor of the field
+
+  h_stats.style.width = f_W;
 
   /* Balls of steel */
   b_C_FR  = "rgb( 255, 94, 94 )";   // ball's color if not clicked
@@ -294,5 +301,15 @@ update = function( dt )
     h_canvas.addEventListener( "mouseup"  , onMouseUp  , false );
     h_canvas.addEventListener( "mousemove", onMouseMove, false );
   }
+
+  h_x.innerHTML = Math.round( b_x * 100 ) / 100;
+  h_y.innerHTML = Math.round( b_y * 100 ) / 100;
+
+  h_sx.innerHTML = Math.round( b_sx * 100 ) / 100;
+  h_sy.innerHTML = Math.round( b_sy * 100 ) / 100;
+
+  h_ax.innerHTML = Math.round( b_ax * 100 ) / 100;
+  h_ay.innerHTML = Math.round( b_ay * 100 ) / 100;
+
   // now seems like a good time to detect and handle collisions
 }
