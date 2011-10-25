@@ -34,12 +34,12 @@ init = function()
   g_F_SCALE  = 8;    // scaling factor applied to the graphic vector to get
                      // force applied to the ball
   g_M_T_OUT  = 750;  // Time out : if the user doesn't move the mouse within 
-                     // that time the move is reset
+                     // that time the move is reset (in ms)
 
-  g_EPS      = 1.5; // something almost zero
+  g_EPS      = 1.5; // something almost zero (pixel wise)
 
   g_m_timer  = 0;
-  g_dtDraw   = 33;
+  g_dtDraw   = 33; // in ms
   g_dtUpdate = 33;
 
   /* Field */
